@@ -9,6 +9,16 @@ WALLPAPER="$1"
 SHADER="$2"
 MONITOR="${3:-ALL}"
 
+if [ ! -f "$WALLPAPER" ]; then
+    echo "Wallpaper file not found: $WALLPAPER"
+    exit 1
+fi
+
+if ! command -v mpvpaper >/dev/null 2>&1; then
+    echo "mpvpaper is not installed or not in PATH"
+    exit 1
+fi
+
 # When a specific monitor is targeted, we don't kill all mpvpaper instances,
 # just the one for that monitor if possible. However mpvpaper doesn't
 # natively support killing by monitor easily via pkill.
@@ -18,18 +28,19 @@ if [ "$MONITOR" = "ALL" ]; then
     pkill -x "mpvpaper" 2>/dev/null
 else
     pgrep -x mpvpaper | while read -r pid; do
-        if ps -p "$pid" -o args= | grep -q "$MONITOR"; then
+        if ps -p "$pid" -o args= | awk -v monitor="$MONITOR" '{for (i = 1; i <= NF; i++) if ($i == monitor) found = 1} END {exit found ? 0 : 1}'; then
             kill "$pid" 2>/dev/null
         fi
     done
 fi
 SOCKET="/tmp/ambxst_mpv_socket_${MONITOR}"
+rm -f "$SOCKET"
 
-MPV_OPTS="no-audio loop hwdec=auto scale=bilinear interpolation=no video-sync=display-resample panscan=1.0 video-scale-x=1.0 video-scale-y=1.0 load-scripts=no input-ipc-server=$SOCKET"
+MPV_OPTS="--no-audio --loop-file=inf --hwdec=auto --scale=bilinear --interpolation=no --video-sync=display-resample --panscan=1.0 --video-scale-x=1.0 --video-scale-y=1.0 --load-scripts=no --input-ipc-server=$SOCKET"
 
 # Si el shader no está vacío y el archivo existe, agregarlo a MPV_OPTS
 if [ -n "$SHADER" ] && [ -f "$SHADER" ]; then
-	MPV_OPTS="$MPV_OPTS glsl-shaders=$SHADER"
+	MPV_OPTS="$MPV_OPTS --glsl-shaders=$SHADER"
 fi
 
 nohup mpvpaper -o "$MPV_OPTS" "$MONITOR" "$WALLPAPER" >/tmp/mpvpaper.log 2>&1 &

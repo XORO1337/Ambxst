@@ -14,6 +14,7 @@ with pkgs; [
   matugen
   python3
   power-profiles-daemon
+  socat
   slurp
   sqlite
   upower
