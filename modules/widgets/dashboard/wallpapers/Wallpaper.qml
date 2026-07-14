@@ -1421,6 +1421,16 @@ PanelWindow {
                 // mpvpaper script handles killing previous instances
                 {}
 
+                Connections {
+                    target: wallpaper
+                    function onCurrentScreenNameChanged() {
+                        if (sourceFile && wallpaper.currentScreenName) {
+                            mpvpaperProcess.running = false;
+                            mpvpaperRestartTimer.restart();
+                        }
+                    }
+                }
+
                 Process {
                     id: mpvpaperProcess
                     running: false
