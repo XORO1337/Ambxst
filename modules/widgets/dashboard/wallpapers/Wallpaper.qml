@@ -142,6 +142,12 @@ PanelWindow {
         return 'unknown';
     }
 
+    function buildWallpaperFindCommand(baseDir) {
+        if (!baseDir)
+            return [];
+        return ["find", baseDir, "-name", ".*", "-prune", "-o", "-type", "f", "(", "-iname", "*.jpg", "-o", "-iname", "*.jpeg", "-o", "-iname", "*.png", "-o", "-iname", "*.webp", "-o", "-iname", "*.tif", "-o", "-iname", "*.tiff", "-o", "-iname", "*.gif", "-o", "-iname", "*.mp4", "-o", "-iname", "*.webm", "-o", "-iname", "*.mov", "-o", "-iname", "*.avi", "-o", "-iname", "*.mkv", ")", "-print"];
+    }
+
     function getThumbnailPath(filePath) {
         // Compute relative path from wallpaperDir
         var basePath = wallpaperDir.endsWith("/") ? wallpaperDir : wallpaperDir + "/";
@@ -264,7 +270,7 @@ PanelWindow {
         directoryWatcher.path = wallpaperDir;
 
         // Force update scan command
-        var cmd = ["find", wallpaperDir, "-name", ".*", "-prune", "-o", "-type", "f", "(", "-name", "*.jpg", "-o", "-name", "*.jpeg", "-o", "-name", "*.png", "-o", "-name", "*.webp", "-o", "-name", "*.tif", "-o", "-name", "*.tiff", "-o", "-name", "*.gif", "-o", "-name", "*.mp4", "-o", "-name", "*.webm", "-o", "-name", "*.mov", "-o", "-name", "*.avi", "-o", "-name", "*.mkv", ")", "-print"];
+        var cmd = buildWallpaperFindCommand(wallpaperDir);
         scanWallpapers.command = cmd;
         scanWallpapers.running = true;
 
@@ -761,7 +767,7 @@ PanelWindow {
                         directoryWatcher.reload();
 
                         // Perform initial wallpaper scan
-                        var cmd = ["find", wallPath, "-name", ".*", "-prune", "-o", "-type", "f", "(", "-name", "*.jpg", "-o", "-name", "*.jpeg", "-o", "-name", "*.png", "-o", "-name", "*.webp", "-o", "-name", "*.tif", "-o", "-name", "*.tiff", "-o", "-name", "*.gif", "-o", "-name", "*.mp4", "-o", "-name", "*.webm", "-o", "-name", "*.mov", "-o", "-name", "*.avi", "-o", "-name", "*.mkv", ")", "-print"];
+                        var cmd = buildWallpaperFindCommand(wallPath);
                         scanWallpapers.command = cmd;
                         scanWallpapers.running = true;
                         wallpaper.scanSubfolders();
@@ -1036,7 +1042,7 @@ PanelWindow {
     Process {
         id: scanWallpapers
         running: false
-        command: wallpaperDir ? ["find", wallpaperDir, "-name", ".*", "-prune", "-o", "-type", "f", "(", "-name", "*.jpg", "-o", "-name", "*.jpeg", "-o", "-name", "*.png", "-o", "-name", "*.webp", "-o", "-name", "*.tif", "-o", "-name", "*.tiff", "-o", "-name", "*.gif", "-o", "-name", "*.mp4", "-o", "-name", "*.webm", "-o", "-name", "*.mov", "-o", "-name", "*.avi", "-o", "-name", "*.mkv", ")", "-print"] : []
+        command: buildWallpaperFindCommand(wallpaperDir)
 
         onRunningChanged: {
             if (running && wallpaperDir === "") {
@@ -1115,7 +1121,7 @@ PanelWindow {
     Process {
         id: scanFallback
         running: false
-        command: ["find", fallbackDir, "-name", ".*", "-prune", "-o", "-type", "f", "(", "-name", "*.jpg", "-o", "-name", "*.jpeg", "-o", "-name", "*.png", "-o", "-name", "*.webp", "-o", "-name", "*.tif", "-o", "-name", "*.tiff", "-o", "-name", "*.gif", "-o", "-name", "*.mp4", "-o", "-name", "*.webm", "-o", "-name", "*.mov", "-o", "-name", "*.avi", "-o", "-name", "*.mkv", ")", "-print"]
+        command: buildWallpaperFindCommand(fallbackDir)
 
         stdout: StdioCollector {
             onStreamFinished: {
