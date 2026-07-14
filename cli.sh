@@ -225,7 +225,7 @@ restart_ambxst() {
 case "${1:-}" in
 update)
 	echo "Updating Ambxst..."
-	curl -fsSL get.axeni.de/ambxst | sh
+	curl -fsSL https://raw.githubusercontent.com/XORO1337/Ambxst/main/install.sh | sh
 	restart_ambxst
 	;;
 refresh)

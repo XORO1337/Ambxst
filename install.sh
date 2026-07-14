@@ -2,7 +2,7 @@
 set -e
 
 # === Configuration ===
-REPO_URL="https://github.com/Axenide/Ambxst.git"
+REPO_URL="https://github.com/XORO1337/Ambxst.git"
 INSTALL_PATH="$HOME/.local/src/ambxst"
 BIN_DIR="/usr/local/bin"
 QUICKSHELL_REPO="https://git.outfoxxed.me/outfoxxed/quickshell"
@@ -96,7 +96,7 @@ filter_packages() {
 install_dependencies() {
   case "$DISTRO" in
   nixos)
-    local FLAKE_URI="${1:-github:Axenide/Ambxst}"
+    local FLAKE_URI="${1:-github:XORO1337/Ambxst}"
     nix profile list | grep -q "ddcutil" && nix profile remove ddcutil 2>/dev/null || true
 
     if nix profile list | grep -q "Ambxst"; then
